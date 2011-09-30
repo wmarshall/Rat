@@ -4,52 +4,52 @@
 */
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
 
-int addTime(int newtime, int *buffer){
+const char atPath[]="/usr/bin/at";
+
+int addTime( int newtime, int *buffer ){
     if (newtime >2400)
         return 1;
     time_t curTime = time(NULL);
     struct tm *tm_struct = localtime (&curTime);
     int currentHours = tm_struct -> tm_hour;
-    printf("Hour = %i\n",currentHours);
     int currentMins = tm_struct -> tm_min;
-    printf("Min = %i\n",currentMins);
     int inHours = (newtime/100);
-    printf("inHours = %i\n",inHours);
-    int inMins = newtime - inHours*100; //Should drop last two digits and calculate difference
-    printf("inMins = %i\n",inMins);
-    int outMins = doSpecialBase(inMins,currentMins,60);
-    
-    int outHours = doSpecialBase(outMins/100+inHours,currentHours,24);
+    int inMins = newtime - inHours*100; 
+    int outMins = doSpecialBase(inMins+currentMins,60);
+    int outHours = doSpecialBase(outMins/100+inHours+currentHours,24);
     int outTime = outMins+outHours*100;
     if ( outTime > 2400 )
         return 1;
     *buffer = outTime;
     return 0;
     }
-int doSpecialBase( int a, int b,int to){
-    int ab = a+b;
+
+int doSpecialBase( int ab, int to ){
     if (ab >=to){
         ab=100;
     }
     return ab;
 }
 
-int main(){
-    time_t curTime;
-    struct tm *tm_struct;
-    curTime = time (NULL);
-    tm_struct = localtime (&curTime);
-    int currentHours = tm_struct -> tm_hour;
-    int currentMins = tm_struct -> tm_min;
-    printf("Time is %i:%d\n" ,currentHours,currentMins);
+int main( int argc, char *argv[] ){
+    if ( argc != 2 ){
+        printf("usage: rat HHMM\nNothing else supported/implemented yet\n");
+        return 2;
+    }
+    int argTime = atoi( argv[1] );
     int result=1;
     int *buffer = &result; 
-    if(addTime(1022, (buffer))){
-        printf("ERR");
+    if( addTime( argTime, buffer ) ){
+        printf("ERR\n");
         return 1;
     }
-    printf("currentTime +%i:%i = %d\n", 10,22,result);
-    return 0;
+    char stringyResult[5]="";
+    sprintf( (&stringyResult[0]),"%04i",result);
+    printf("currentTime +%02i:%02i = %04d\n",argTime/100,argTime-argTime/100,result);
+    const char callString[16] = "";
+    sprintf( (&callString[0]), "%s %04i", atPath, result);
+    return system( (&callString[0]) );
     }
 
