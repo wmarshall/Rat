@@ -5,7 +5,7 @@ A relative time frontend to at.
 
 Invocation:
     rat HHMM
-        executes supplied commands in HH hours, MM minutes
+        Executes supplied commands in HH hours, MM minutes
         Responds with ERR and returns 1 if my crappy time addition goes over
         2400
 
@@ -13,3 +13,9 @@ TODO:
     Support for rolling over days
     Support for days after this one
     More descriptive errors
+
+Compiling:
+    Execute the build.sh script.
+
+Dependencies:
+    at >= 3.1.13
